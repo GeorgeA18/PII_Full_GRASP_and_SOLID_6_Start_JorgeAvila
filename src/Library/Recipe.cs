@@ -16,6 +16,18 @@ namespace Full_GRASP_And_SOLID
 
         public Product FinalProduct { get; set; }
 
+        public bool Cooked { get; private set; }
+
+        private CountdownTimer Timer;
+        private TimerAdapter timerClient;
+
+        public Recipe()
+        {
+            this.Cooked = false;
+            // this.Timer.Register(2000, this);
+        }
+
+
         // Agregado por Creator
         public void AddStep(Product input, double quantity, Equipment equipment, int time)
         {
@@ -62,5 +74,42 @@ namespace Full_GRASP_And_SOLID
 
             return result;
         }
+
+
+        public int GetCookTime()
+        {
+            int time = 0;
+
+            foreach (BaseStep step in this.steps)
+            {
+                time = time + step.Time;
+            }
+
+            return time;
+        }
+
+        public void Cook()
+        {
+            if (this.Cooked) throw new InvalidOperationException("Receta ya lista");
+
+            this.StartCountTimer();
+
+        }
+
+        public void StartCountTimer()
+        {
+            this.timerClient = new TimerAdapter(this);
+
+            this.Timer = new CountdownTimer();
+            this.Timer.Register(this.GetCookTime(), timerClient);
+
+
+        }
+
+        public void TimeOut()
+        {
+            this.Cooked = true;
+        }
+
     }
 }
